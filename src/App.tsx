@@ -4,7 +4,6 @@ import {
   DEFAULT_QUESTS, 
   SHOP_ITEMS, 
   KANJI_POOL, 
-  DEFAULT_AVATAR_URL, 
   SENSEI_AVATAR_URL 
 } from './constants';
 import { 
@@ -137,6 +136,18 @@ function App() {
     const v = localStorage.getItem('benkyou_rpg_kanji');
     return v ? JSON.parse(v) : [];
   });
+
+
+  const [username, setUsername] = useState<string>(() => {
+    return localStorage.getItem('benkyou_username') || 'Adventurer';
+  });
+  const [charClass, setCharClass] = useState<string>(() => {
+    return localStorage.getItem('benkyou_char_class') || 'Warrior';
+  });
+  const [avatarSeed, setAvatarSeed] = useState<string>(() => {
+    return localStorage.getItem('benkyou_avatar_seed') || 'seed';
+  });
+  const [shareCodeInput, setShareCodeInput] = useState<string>('');
 
   // Base app states
   const [quests, setQuests] = useState<Quest[]>([]);
@@ -281,6 +292,19 @@ function App() {
       setIsCheckingAuth(false);
     }
   }, [dbConfig.isConfigured]);
+
+  // 4. Update Character states on User session changes
+  useEffect(() => {
+    if (user) {
+      setUsername(user.user_metadata?.username || user.email?.split('@')[0] || 'Adventurer');
+      setCharClass(user.user_metadata?.char_class || 'Warrior');
+      setAvatarSeed(user.user_metadata?.avatar_seed || user.email?.split('@')[0] || 'seed');
+    } else {
+      setUsername(localStorage.getItem('benkyou_username') || 'Adventurer');
+      setCharClass(localStorage.getItem('benkyou_char_class') || 'Warrior');
+      setAvatarSeed(localStorage.getItem('benkyou_avatar_seed') || 'seed');
+    }
+  }, [user]);
 
   // Fetch data whenever user session or dbConfig updates
   useEffect(() => {
@@ -802,6 +826,211 @@ function App() {
     setSelectedInventoryItem(null);
   };
 
+  // RPG Rank Calculation Helper
+  const getAdventurerRank = (lvl: number) => {
+    if (lvl >= 50) return { name: 'S-Rank Legend', color: '#ff4e4e' };
+    if (lvl >= 30) return { name: 'A-Rank Hero', color: '#ffd700' };
+    if (lvl >= 20) return { name: 'B-Rank Champion', color: '#da70d6' };
+    if (lvl >= 15) return { name: 'C-Rank Elite', color: '#4e9cff' };
+    if (lvl >= 10) return { name: 'D-Rank Adventurer', color: '#10b981' };
+    if (lvl >= 5) return { name: 'E-Rank Apprentice', color: '#c8c6c6' };
+    return { name: 'F-Rank Novice', color: '#999077' };
+  };
+
+  // Character Customization Save Function
+  const handleSaveCharacter = async (newUsername: string, newClass: string, newSeed: string) => {
+    setUsername(newUsername);
+    setCharClass(newClass);
+    setAvatarSeed(newSeed);
+    
+    localStorage.setItem('benkyou_username', newUsername);
+    localStorage.setItem('benkyou_char_class', newClass);
+    localStorage.setItem('benkyou_avatar_seed', newSeed);
+    
+    const client = getSupabaseClient();
+    if (client && user) {
+      try {
+        const { error } = await client.auth.updateUser({
+          data: {
+            username: newUsername,
+            char_class: newClass,
+            avatar_seed: newSeed
+          }
+        });
+        if (error) throw error;
+        showNotification('Karakter berhasil diperbarui di cloud!', 'success');
+      } catch (err: any) {
+        console.error('Failed to update character to Supabase auth:', err);
+        showNotification('Karakter diperbarui secara lokal.', 'info');
+      }
+    } else {
+      showNotification('Karakter diperbarui secara lokal.', 'success');
+    }
+  };
+
+  // Quest Pack Application Function
+  const applyQuestPack = async (packId: string) => {
+    let packQuests: Omit<Quest, 'id' | 'is_custom'>[] = [];
+    let price = 0;
+    let packName = '';
+    
+    if (packId === 'pack_relaxed') {
+      packName = 'Paket Santai (Relaxed)';
+      price = 10;
+      packQuests = [
+        { title: 'Minum Air Putih Pagi (Santai)', duration: '5 Menit', time_of_day: 'Pagi', phase: 'Alternatif', tools: 'Gelas Air', details: 'Minum 500ml air putih sesaat setelah bangun.', xp_reward: 30, gold_reward: 15, rank: 'D' },
+        { title: 'Merapikan Tempat Tidur (Santai)', duration: '5 Menit', time_of_day: 'Pagi', phase: 'Alternatif', tools: 'Tangan', details: 'Rapikan sprei segera setelah bangun.', xp_reward: 30, gold_reward: 15, rank: 'D' },
+        { title: 'Jalan Santai Sore (Santai)', duration: '15 Menit', time_of_day: 'Siang', phase: 'Alternatif', tools: 'Luar Rumah', details: 'Jalan 1000 langkah di sore hari.', xp_reward: 40, gold_reward: 20, rank: 'C' }
+      ];
+    } else if (packId === 'pack_warrior') {
+      packName = 'Paket Prajurit (Warrior)';
+      price = 50;
+      packQuests = [
+        { title: 'Peregangan Tubuh (Warrior)', duration: '10 Menit', time_of_day: 'Pagi', phase: 'Alternatif', tools: 'Matras', details: 'Lakukan dinamis stretching di pagi hari.', xp_reward: 50, gold_reward: 30, rank: 'C' },
+        { title: 'Deep Work Session (Warrior)', duration: '30 Menit', time_of_day: 'Siang', phase: 'Alternatif', tools: 'Pomodoro', details: 'Fokus kerja/belajar tanpa handphone selama 30 menit.', xp_reward: 60, gold_reward: 35, rank: 'B' },
+        { title: 'Membaca Buku (Warrior)', duration: '15 Menit', time_of_day: 'Malam', phase: 'Alternatif', tools: 'Buku', details: 'Baca minimal 5 halaman buku baru.', xp_reward: 50, gold_reward: 30, rank: 'C' }
+      ];
+    } else if (packId === 'pack_champion') {
+      packName = 'Paket Juara (Champion)';
+      price = 100;
+      packQuests = [
+        { title: 'Meditasi & Peregangan (Champion)', duration: '20 Menit', time_of_day: 'Pagi', phase: 'Alternatif', tools: 'Matras & Timer', details: 'Meditasi 10 menit + stretching 10 menit.', xp_reward: 80, gold_reward: 45, rank: 'B' },
+        { title: 'Deep Work Fokus Tinggi (Champion)', duration: '60 Menit', time_of_day: 'Siang', phase: 'Alternatif', tools: 'Laptop/Buku', details: 'Kerja/belajar fokus penuh 60 menit.', xp_reward: 100, gold_reward: 60, rank: 'A' },
+        { title: 'Latihan Kekuatan Intensif (Champion)', duration: '45 Menit', time_of_day: 'Siang', phase: 'Alternatif', tools: 'Sepatu & Dumbbell', details: 'Olahraga intensif push-up, squat, atau angkat beban.', xp_reward: 100, gold_reward: 60, rank: 'A' },
+        { title: 'Jurnal & Membaca Buku (Champion)', duration: '30 Menit', time_of_day: 'Malam', phase: 'Alternatif', tools: 'Jurnal & E-Reader', details: 'Tulis evaluasi harian + baca buku 20 menit.', xp_reward: 80, gold_reward: 45, rank: 'B' }
+      ];
+    }
+
+    if (gold < price) {
+      showNotification('Gold tidak cukup untuk membeli paket ini!', 'error');
+      return;
+    }
+
+    setGold(g => g - price);
+
+    const newQuests: Quest[] = packQuests.map((q, idx) => ({
+      ...q,
+      id: `pack-${packId}-${Date.now()}-${idx}`,
+      is_custom: true
+    }));
+
+    setQuests(prev => [...newQuests, ...prev]);
+
+    const client = getSupabaseClient();
+    if (client && user) {
+      try {
+        const dbFormatQuests = newQuests.map(q => ({
+          id: q.id,
+          title: q.title,
+          duration: q.duration,
+          time_of_day: q.time_of_day,
+          phase: q.phase,
+          tools: q.tools,
+          details: q.details,
+          is_custom: q.is_custom,
+          user_id: user.id,
+          xp_reward: q.xp_reward || 50,
+          gold_reward: q.gold_reward || 30,
+          rank: q.rank || 'C'
+        }));
+        await client.from('quests').insert(dbFormatQuests);
+      } catch (err) {
+        console.error('Error saving pack quests to cloud:', err);
+      }
+    } else {
+      const localCustoms = JSON.parse(localStorage.getItem('benkyou_custom_quests') || '[]');
+      localStorage.setItem('benkyou_custom_quests', JSON.stringify([...newQuests, ...localCustoms]));
+    }
+
+    showNotification(`Berhasil membeli & memasang ${packName}!`, 'success');
+  };
+
+  // Export Quests to Clipboard
+  const exportQuests = () => {
+    const exportData = quests.map(q => ({
+      title: q.title,
+      duration: q.duration,
+      time_of_day: q.time_of_day,
+      phase: q.phase,
+      tools: q.tools,
+      details: q.details,
+      xp_reward: q.xp_reward || 50,
+      gold_reward: q.gold_reward || 30,
+      rank: q.rank || 'C'
+    }));
+    
+    try {
+      const jsonStr = JSON.stringify(exportData);
+      const base64Str = btoa(unescape(encodeURIComponent(jsonStr)));
+      const shareCode = `HA_QUESTS:${base64Str}`;
+      navigator.clipboard.writeText(shareCode);
+      showNotification('Kode Quest berhasil disalin ke Clipboard! Bagikan ke teman Anda.', 'success');
+    } catch (err) {
+      showNotification('Gagal membuat kode quest', 'error');
+    }
+  };
+
+  // Import Quests from paste string
+  const importQuests = async (shareCode: string) => {
+    if (!shareCode.startsWith('HA_QUESTS:')) {
+      showNotification('Format kode quest tidak valid!', 'error');
+      return;
+    }
+    
+    try {
+      const base64Str = shareCode.split(':')[1];
+      const jsonStr = decodeURIComponent(escape(atob(base64Str)));
+      const importedData = JSON.parse(jsonStr);
+      
+      if (!Array.isArray(importedData)) {
+        throw new Error('Data bukan array');
+      }
+      
+      const newQuests: Quest[] = importedData.map((q, idx) => ({
+        id: `imported-${Date.now()}-${idx}`,
+        title: q.title || 'Quest Tanpa Judul',
+        duration: q.duration || '10 Menit',
+        time_of_day: q.time_of_day || 'Bebas',
+        phase: q.phase || 'Alternatif',
+        tools: q.tools || '',
+        details: q.details || '',
+        xp_reward: q.xp_reward || 50,
+        gold_reward: q.gold_reward || 30,
+        rank: q.rank || 'C',
+        is_custom: true
+      }));
+      
+      setQuests(prev => [...newQuests, ...prev]);
+      
+      const client = getSupabaseClient();
+      if (client && user) {
+        const dbFormatQuests = newQuests.map(q => ({
+          id: q.id,
+          title: q.title,
+          duration: q.duration,
+          time_of_day: q.time_of_day,
+          phase: q.phase,
+          tools: q.tools,
+          details: q.details,
+          is_custom: q.is_custom,
+          user_id: user.id,
+          xp_reward: q.xp_reward,
+          gold_reward: q.gold_reward,
+          rank: q.rank
+        }));
+        await client.from('quests').insert(dbFormatQuests);
+      } else {
+        const localCustoms = JSON.parse(localStorage.getItem('benkyou_custom_quests') || '[]');
+        localStorage.setItem('benkyou_custom_quests', JSON.stringify([...newQuests, ...localCustoms]));
+      }
+      
+      showNotification(`Berhasil mengimpor ${newQuests.length} Quest baru!`, 'success');
+      setShareCodeInput('');
+    } catch (err) {
+      showNotification('Gagal mengimpor quest. Periksa kembali kode Anda.', 'error');
+    }
+  };
+
   // Google OAuth Login Trigger
   const handleGoogleLogin = async () => {
     const client = getSupabaseClient();
@@ -1050,43 +1279,48 @@ function App() {
         </div>
         <div className="flex items-center gap-3">
           {user ? (
-            <div className="profile-dropdown-wrapper">
-              <div 
-                className="game-avatar-container" 
-                title={user.email}
-                style={{ cursor: 'pointer' }}
-                onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-              >
-                <img 
-                  className="game-avatar-img" 
-                  src={user.user_metadata?.avatar_url || DEFAULT_AVATAR_URL} 
-                  alt="User Avatar" 
-                />
-              </div>
-
-              {isProfileDropdownOpen && (
-                <>
-                  <div 
-                    className="dropdown-overlay" 
-                    onClick={() => setIsProfileDropdownOpen(false)} 
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--primary-fixed)', fontFamily: 'var(--font-mono)' }}>
+                {username}
+              </span>
+              <div className="profile-dropdown-wrapper">
+                <div 
+                  className="game-avatar-container" 
+                  title={user.email}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                >
+                  <img 
+                    className="game-avatar-img" 
+                    src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${avatarSeed || 'seed'}`} 
+                    alt="User Avatar" 
                   />
-                  <div className="profile-dropdown">
-                    <div className="profile-dropdown-header">
-                      {user.email}
+                </div>
+
+                {isProfileDropdownOpen && (
+                  <>
+                    <div 
+                      className="dropdown-overlay" 
+                      onClick={() => setIsProfileDropdownOpen(false)} 
+                    />
+                    <div className="profile-dropdown">
+                      <div className="profile-dropdown-header">
+                        {user.email}
+                      </div>
+                      <button 
+                        className="profile-dropdown-item danger" 
+                        onClick={() => {
+                          setIsProfileDropdownOpen(false);
+                          handleLogout();
+                        }}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: '1.1rem' }}>logout</span>
+                        Sign Out
+                      </button>
                     </div>
-                    <button 
-                      className="profile-dropdown-item danger" 
-                      onClick={() => {
-                        setIsProfileDropdownOpen(false);
-                        handleLogout();
-                      }}
-                    >
-                      <span className="material-symbols-outlined" style={{ fontSize: '1.1rem' }}>logout</span>
-                      Sign Out
-                    </button>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
+              </div>
             </div>
           ) : (
             <button 
@@ -1139,6 +1373,16 @@ function App() {
             </span>
             <span style={{ color: 'var(--success-green)', fontWeight: 'bold' }}>
               🔥 STREAK: {currentStreak} HARI
+            </span>
+          </div>
+
+          {/* Adventurer Rank & Class row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontFamily: 'Space Grotesk', borderTop: '1px dashed #333', paddingTop: '0.5rem', marginTop: '0.25rem' }}>
+            <span style={{ color: getAdventurerRank(level).color, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>military_tech</span> {getAdventurerRank(level).name}
+            </span>
+            <span style={{ color: '#fff', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              {charClass === 'Warrior' ? '🛡️ WARRIOR' : charClass === 'Mage' ? '🔮 MAGE' : charClass === 'Rogue' ? '🗡️ ROGUE' : '✨ CLERIC'}
             </span>
           </div>
         </div>
@@ -1357,7 +1601,149 @@ function App() {
 
         {activeTab === 'gilda' && (
           <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--primary-fixed)' }}>GILDA STATS & DATABASE</h3>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--primary-fixed)' }}>GILDA STATS & ADVENTURER PROFILE</h3>
+
+            {/* Custom Character & Class Settings */}
+            <div style={{ backgroundColor: 'var(--surface-container)', padding: '1rem', border: '2px solid var(--outline-variant)', marginBottom: '1.5rem' }}>
+              <h4 style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '1rem', color: 'var(--on-surface)' }}>Kustomisasi Karakter RPG</h4>
+              
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                  <div className="pixel-border" style={{ width: '80px', height: '80px', backgroundColor: 'var(--surface-container-lowest)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}>
+                    <img 
+                      src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${avatarSeed || 'seed'}`} 
+                      alt="Avatar Preview" 
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
+                  </div>
+                  <span style={{ fontSize: '0.65rem', color: 'var(--on-surface-variant)', fontFamily: 'var(--font-mono)' }}>Seed: {avatarSeed}</span>
+                </div>
+                
+                <div style={{ flex: '1 1 250px', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div className="rpg-form-group" style={{ marginBottom: 0 }}>
+                    <label className="rpg-label" style={{ fontSize: '0.7rem' }}>Nama Adventurer (Username)</label>
+                    <input 
+                      type="text" 
+                      className="rpg-input" 
+                      value={username} 
+                      onChange={e => setUsername(e.target.value)} 
+                      placeholder="Masukkan nama..."
+                      style={{ fontSize: '0.8rem', padding: '0.4rem 0.6rem' }}
+                    />
+                  </div>
+
+                  <div className="rpg-form-group" style={{ marginBottom: 0 }}>
+                    <label className="rpg-label" style={{ fontSize: '0.7rem' }}>Kelas RPG</label>
+                    <select 
+                      className="rpg-select" 
+                      value={charClass} 
+                      onChange={e => setCharClass(e.target.value)}
+                      style={{ fontSize: '0.8rem', padding: '0.4rem 0.6rem' }}
+                    >
+                      <option value="Warrior">🛡️ Warrior</option>
+                      <option value="Mage">🔮 Mage</option>
+                      <option value="Rogue">🗡️ Rogue</option>
+                      <option value="Cleric">✨ Cleric</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rpg-form-group" style={{ marginBottom: '1rem' }}>
+                <label className="rpg-label" style={{ fontSize: '0.7rem' }}>Kustomisasi Seed Avatar</label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input 
+                    type="text" 
+                    className="rpg-input" 
+                    value={avatarSeed} 
+                    onChange={e => setAvatarSeed(e.target.value)} 
+                    placeholder="Masukkan seed acak..."
+                    style={{ fontSize: '0.8rem', padding: '0.4rem 0.6rem' }}
+                  />
+                  <button 
+                    className="pixel-btn" 
+                    onClick={() => setAvatarSeed(Math.random().toString(36).substring(2, 9))}
+                    style={{ fontSize: '0.75rem', padding: '0.4rem 0.75rem' }}
+                  >
+                    Acak
+                  </button>
+                </div>
+              </div>
+
+              {/* Preset Quick Seeds */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <label className="rpg-label" style={{ fontSize: '0.65rem', marginBottom: '0.25rem', display: 'block' }}>Rekomendasi Karakter Preset</label>
+                <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+                  {['Arthur', 'Gollum', 'Gandalf', 'Joan', 'Kaguya', 'Hattori'].map(preset => (
+                    <button 
+                      key={preset}
+                      className="pixel-border"
+                      onClick={() => setAvatarSeed(preset)}
+                      style={{ 
+                        fontSize: '0.65rem', 
+                        padding: '0.25rem 0.5rem', 
+                        backgroundColor: avatarSeed === preset ? 'var(--primary-container)' : 'var(--surface-container-lowest)',
+                        cursor: 'pointer',
+                        color: avatarSeed === preset ? 'var(--on-primary-container)' : 'var(--on-surface)'
+                      }}
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button 
+                className="pixel-btn pixel-btn-primary" 
+                onClick={() => handleSaveCharacter(username, charClass, avatarSeed)}
+                style={{ width: '100%', justifyContent: 'center', fontSize: '0.8rem', padding: '0.5rem' }}
+              >
+                Simpan Karakter & Sinkronisasi
+              </button>
+            </div>
+
+            {/* Share / Export & Import Tasks */}
+            <div style={{ backgroundColor: 'var(--surface-container)', padding: '1rem', border: '2px solid var(--outline-variant)', marginBottom: '1.5rem' }}>
+              <h4 style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.75rem', color: 'var(--on-surface)' }}>Bagikan & Impor Quest Harian</h4>
+              <p style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)', marginBottom: '1rem' }}>
+                Anda dapat menyalin seluruh quest harian Anda saat ini untuk dibagikan ke teman, atau menempelkan kode quest dari teman untuk langsung dipasang di tracker Anda.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <button 
+                    className="pixel-btn" 
+                    onClick={exportQuests}
+                    style={{ width: '100%', justifyContent: 'center', fontSize: '0.8rem', padding: '0.5rem' }}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '1rem', marginRight: '0.25rem' }}>share</span>
+                    Salin Kode Quest Saya (Export)
+                  </button>
+                </div>
+
+                <div style={{ borderTop: '1px dashed var(--outline-variant)', paddingTop: '1rem' }}>
+                  <label className="rpg-label" style={{ fontSize: '0.7rem' }}>Impor Quest Orang Lain</label>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
+                    <input 
+                      type="text" 
+                      className="rpg-input" 
+                      value={shareCodeInput} 
+                      onChange={e => setShareCodeInput(e.target.value)} 
+                      placeholder="Tempel kode HA_QUESTS:... disini"
+                      style={{ fontSize: '0.8rem', padding: '0.4rem 0.6rem', fontFamily: 'var(--font-mono)' }}
+                    />
+                    <button 
+                      className="pixel-btn pixel-btn-primary" 
+                      onClick={() => importQuests(shareCodeInput)}
+                      disabled={!shareCodeInput}
+                      style={{ fontSize: '0.75rem', padding: '0.4rem 0.75rem', opacity: shareCodeInput ? 1 : 0.5 }}
+                    >
+                      Impor
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Streak & Consistency Matrix */}
             <div style={{ backgroundColor: 'var(--surface-container)', padding: '1rem', border: '2px solid var(--outline-variant)', marginBottom: '1.5rem' }}>
@@ -1473,6 +1859,85 @@ function App() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '2rem', marginBottom: '1rem', color: 'var(--primary-fixed)' }}>PAKET QUEST DAILY TASK</h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-variant)', marginBottom: '1rem' }}>
+              Beli paket quest untuk menambahkan serangkaian target aktivitas harian dengan tingkat intensitas yang berbeda ke daftar Quest Anda!
+            </p>
+            
+            <div className="shop-grid">
+              {/* 1. Paket Santai */}
+              <div className="shop-card">
+                <span className="material-symbols-outlined item-icon" style={{ color: '#10b981' }}>
+                  spa
+                </span>
+                <div className="item-name">Paket Santai (Relaxed)</div>
+                <div className="item-desc">Cocok untuk pemula. Berisi quest hidrasi, merapikan tempat tidur, dan jalan santai sore.</div>
+                
+                <div className="item-price-row">
+                  <div className="item-price">
+                    <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>payments</span>
+                    10 G
+                  </div>
+                  <button 
+                    className="pixel-btn pixel-btn-primary"
+                    onClick={() => applyQuestPack('pack_relaxed')}
+                    disabled={gold < 10}
+                    style={{ opacity: gold < 10 ? 0.5 : 1, cursor: gold < 10 ? 'not-allowed' : 'pointer' }}
+                  >
+                    Beli Pack
+                  </button>
+                </div>
+              </div>
+
+              {/* 2. Paket Prajurit */}
+              <div className="shop-card">
+                <span className="material-symbols-outlined item-icon" style={{ color: '#4e9cff' }}>
+                  shield
+                </span>
+                <div className="item-name">Paket Prajurit (Warrior)</div>
+                <div className="item-desc">Tingkat menengah. Berisi stretching, 30 menit deep work harian, dan membaca buku.</div>
+                
+                <div className="item-price-row">
+                  <div className="item-price">
+                    <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>payments</span>
+                    50 G
+                  </div>
+                  <button 
+                    className="pixel-btn pixel-btn-primary"
+                    onClick={() => applyQuestPack('pack_warrior')}
+                    disabled={gold < 50}
+                    style={{ opacity: gold < 50 ? 0.5 : 1, cursor: gold < 50 ? 'not-allowed' : 'pointer' }}
+                  >
+                    Beli Pack
+                  </button>
+                </div>
+              </div>
+
+              {/* 3. Paket Juara */}
+              <div className="shop-card">
+                <span className="material-symbols-outlined item-icon" style={{ color: '#ffd700' }}>
+                  swords
+                </span>
+                <div className="item-name">Paket Juara (Champion)</div>
+                <div className="item-desc">Intensitas tinggi. Berisi meditasi, 60 menit deep work, latihan beban intensif, dan jurnal harian.</div>
+                
+                <div className="item-price-row">
+                  <div className="item-price">
+                    <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>payments</span>
+                    100 G
+                  </div>
+                  <button 
+                    className="pixel-btn pixel-btn-primary"
+                    onClick={() => applyQuestPack('pack_champion')}
+                    disabled={gold < 100}
+                    style={{ opacity: gold < 100 ? 0.5 : 1, cursor: gold < 100 ? 'not-allowed' : 'pointer' }}
+                  >
+                    Beli Pack
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
