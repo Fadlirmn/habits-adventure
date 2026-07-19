@@ -107,6 +107,7 @@ function App() {
   // Authentication & Loading States
   const [user, setUser] = useState<any>(null);
   const [isProfileLoading, setIsProfileLoading] = useState<boolean>(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
 
   // Core stats states (with LocalStorage initializers)
   const [hp, setHp] = useState<number>(() => {
@@ -261,7 +262,13 @@ function App() {
     if (client) {
       client.auth.getSession().then(({ data: { session } }) => {
         setUser(session?.user ?? null);
-        if (session?.user) fetchProfile(session.user.id);
+        if (session?.user) {
+          fetchProfile(session.user.id);
+        } else {
+          setIsCheckingAuth(false);
+        }
+      }).catch(() => {
+        setIsCheckingAuth(false);
       });
 
       const { data: { subscription } } = client.auth.onAuthStateChange((_event, session) => {
@@ -270,10 +277,13 @@ function App() {
           fetchProfile(session.user.id);
         } else {
           loadFromLocalStorage();
+          setIsCheckingAuth(false);
         }
       });
 
       return () => subscription.unsubscribe();
+    } else {
+      setIsCheckingAuth(false);
     }
   }, [dbConfig.isConfigured]);
 
@@ -330,6 +340,7 @@ function App() {
       loadFromLocalStorage();
     } finally {
       setIsProfileLoading(false);
+      setIsCheckingAuth(false);
     }
   };
 
@@ -890,6 +901,135 @@ function App() {
   const eveningQuests = activePhaseQuests.filter(q => q.time_of_day === 'Malam');
   const normalQuests = activePhaseQuests.filter(q => q.time_of_day === 'Bebas');
 
+  if (isCheckingAuth) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: 'radial-gradient(circle at center, #1a0f2e 0%, #0d0614 100%)',
+        color: '#fff',
+        fontFamily: 'Space Grotesk, sans-serif'
+      }}>
+        <span className="material-symbols-outlined spin" style={{ fontSize: '3rem', color: '#ffd700', marginBottom: '1rem' }}>sync</span>
+        <p style={{ letterSpacing: '2px', fontWeight: 'bold', fontSize: '0.9rem', color: '#ffd700' }}>MEMBACA GERBANG DIMENSI (AUTH)...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="login-screen-container" style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: 'radial-gradient(circle at center, #1a0f2e 0%, #0d0614 100%)',
+        color: '#fff',
+        fontFamily: 'Space Grotesk, sans-serif',
+        padding: '2rem',
+        textAlign: 'center'
+      }}>
+        {notification && (
+          <div 
+            style={{
+              position: 'fixed',
+              top: '20px',
+              right: '20px',
+              zIndex: 1100,
+              padding: '1rem 1.25rem',
+              borderRadius: '0px',
+              background: notification.type === 'success' ? '#113a1a' : notification.type === 'error' ? '#5a1111' : '#11253a',
+              border: `2px solid ${notification.type === 'success' ? '#10b981' : notification.type === 'error' ? '#ff4e4e' : '#ffd700'}`,
+              color: '#fff',
+              boxShadow: '4px 4px 0px 0px #000',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              animation: 'levelUpPop 0.15s ease-out'
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ color: notification.type === 'success' ? '#10b981' : notification.type === 'error' ? '#ff4e4e' : '#ffd700' }}>
+              {notification.type === 'success' ? 'check_circle' : notification.type === 'error' ? 'error' : 'info'}
+            </span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 700, fontFamily: 'Space Grotesk' }}>{notification.message}</span>
+          </div>
+        )}
+        
+        <div style={{
+          border: '4px double #ffd700',
+          background: 'rgba(0, 0, 0, 0.8)',
+          padding: '3.5rem 2.5rem',
+          maxWidth: '450px',
+          width: '100%',
+          boxShadow: '0 0 35px rgba(255, 215, 0, 0.2), inset 0 0 25px rgba(0, 0, 0, 0.9)',
+          borderRadius: '4px',
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
+        }}>
+          {/* Decorative Corner Ornaments */}
+          <div style={{ position: 'absolute', top: '8px', left: '8px', color: '#ffd700', fontSize: '1.25rem', opacity: 0.8 }}>❖</div>
+          <div style={{ position: 'absolute', top: '8px', right: '8px', color: '#ffd700', fontSize: '1.25rem', opacity: 0.8 }}>❖</div>
+          <div style={{ position: 'absolute', bottom: '8px', left: '8px', color: '#ffd700', fontSize: '1.25rem', opacity: 0.8 }}>❖</div>
+          <div style={{ position: 'absolute', bottom: '8px', right: '8px', color: '#ffd700', fontSize: '1.25rem', opacity: 0.8 }}>❖</div>
+
+          <span className="material-symbols-outlined spin text-primary-fixed" style={{ 
+            fontSize: '4.5rem', 
+            color: '#ffd700',
+            textShadow: '0 0 15px rgba(255, 215, 0, 0.6)',
+            marginBottom: '1.5rem'
+          }}>
+            swords
+          </span>
+          
+          <h1 style={{ 
+            fontSize: '2.25rem', 
+            fontWeight: 900, 
+            letterSpacing: '3px',
+            color: '#ffd700',
+            textShadow: '2px 2px 0px #000, 0 0 12px rgba(255,215,0,0.4)',
+            marginBottom: '0.75rem',
+            fontFamily: 'Cinzel, Georgia, serif'
+          }}>
+            ISEKAI NIHONGO
+          </h1>
+          
+          <p style={{ 
+            fontSize: '0.85rem', 
+            color: '#c0c0c0', 
+            marginBottom: '2.5rem',
+            lineHeight: '1.6'
+          }}>
+            Mulailah petualangan RPG belajar Bahasa Jepang harian Anda. Silakan masuk menggunakan Google OAuth untuk mensinkronisasikan dan mengamankan progres petualangan Anda.
+          </p>
+
+          <button 
+            className="pixel-btn pixel-btn-primary" 
+            onClick={handleGoogleLogin}
+            style={{ 
+              fontSize: '0.95rem', 
+              padding: '0.75rem 1.5rem',
+              width: '100%',
+              justifyContent: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              boxShadow: '4px 4px 0px #ffd700'
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '1.3rem' }}>login</span>
+            Masuk dengan Google
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Toast Notification */}
@@ -947,18 +1087,11 @@ function App() {
               onClick={handleGoogleLogin}
               style={{ fontSize: '0.7rem', padding: '0.3rem 0.6rem' }}
               disabled={!dbConfig.isConfigured}
-              title={!dbConfig.isConfigured ? "Hubungkan Supabase terlebih dahulu" : "Login Google"}
+              title="Login Google"
             >
               Google Login
             </button>
           )}
-          <button 
-            className="pixel-btn pixel-btn-icon"
-            onClick={() => setIsSettingsOpen(true)}
-            title="Database Cloud Settings"
-          >
-            <span className="material-symbols-outlined">settings</span>
-          </button>
         </div>
       </header>
 
@@ -1298,13 +1431,6 @@ function App() {
                     {dbConfig.isConfigured ? `Terhubung (${dbConfig.source})` : 'Offline (Lokal)'}
                   </span>
                 </div>
-                <button 
-                  className="pixel-btn" 
-                  style={{ width: '100%', justifyContent: 'center' }}
-                  onClick={() => setIsSettingsOpen(true)}
-                >
-                  <span className="material-symbols-outlined">cloud_sync</span> Buka Konfigurasi Cloud
-                </button>
               </div>
             </div>
 

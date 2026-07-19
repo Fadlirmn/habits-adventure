@@ -11,13 +11,6 @@ export const getSupabaseConfig = (): SupabaseConfig => {
   const envUrl = import.meta.env.VITE_SUPABASE_URL;
   const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-  const localUrl = localStorage.getItem('benkyou_supabase_url');
-  const localKey = localStorage.getItem('benkyou_supabase_key');
-
-  if (localUrl && localKey) {
-    return { url: localUrl, key: localKey, isConfigured: true, source: 'local' };
-  }
-
   if (envUrl && envKey) {
     return { url: envUrl, key: envKey, isConfigured: true, source: 'env' };
   }
