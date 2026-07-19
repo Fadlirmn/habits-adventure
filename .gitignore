@@ -40,3 +40,6 @@ dist-ssr
 .agents
 .claude
 /Layout-mockup
+
+# Instagram Caption
+caption.txt
