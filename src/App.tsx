@@ -148,6 +148,7 @@ function App() {
   const [expandedQuestId, setExpandedQuestId] = useState<string | null>(null);
 
   // Modals state
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState<boolean>(false);
   const [isQuestModalOpen, setIsQuestModalOpen] = useState<boolean>(false);
   const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
   const [showLevelUp, setShowLevelUp] = useState<boolean>(false);
@@ -1049,12 +1050,12 @@ function App() {
         </div>
         <div className="flex items-center gap-3">
           {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div className="profile-dropdown-wrapper">
               <div 
                 className="game-avatar-container" 
                 title={user.email}
                 style={{ cursor: 'pointer' }}
-                onClick={handleLogout}
+                onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
               >
                 <img 
                   className="game-avatar-img" 
@@ -1062,6 +1063,30 @@ function App() {
                   alt="User Avatar" 
                 />
               </div>
+
+              {isProfileDropdownOpen && (
+                <>
+                  <div 
+                    className="dropdown-overlay" 
+                    onClick={() => setIsProfileDropdownOpen(false)} 
+                  />
+                  <div className="profile-dropdown">
+                    <div className="profile-dropdown-header">
+                      {user.email}
+                    </div>
+                    <button 
+                      className="profile-dropdown-item danger" 
+                      onClick={() => {
+                        setIsProfileDropdownOpen(false);
+                        handleLogout();
+                      }}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: '1.1rem' }}>logout</span>
+                      Sign Out
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             <button 

@@ -780,3 +780,67 @@ body {
 .spin {
   animation: spin 2s linear infinite;
 }
+
+/* Profile Dropdown */
+.profile-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background-color: var(--surface-container);
+  border: 2px solid var(--outline-variant);
+  box-shadow: 4px 4px 0px 0px #000;
+  z-index: 150;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-dropdown-header {
+  padding: 0.75rem;
+  border-bottom: 1px dashed var(--outline-variant);
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  color: var(--on-surface-variant);
+  word-break: break-all;
+}
+
+.profile-dropdown-item {
+  padding: 0.75rem;
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+}
+
+.profile-dropdown-item:hover {
+  background-color: var(--surface-container-high);
+  color: var(--primary-fixed);
+}
+
+.profile-dropdown-item.danger:hover {
+  color: var(--health-red);
+}
+
+.dropdown-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 140;
+  background: transparent;
+}
