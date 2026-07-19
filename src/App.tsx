@@ -294,7 +294,10 @@ function App() {
 
   const fetchProfile = async (userId: string) => {
     const client = getSupabaseClient();
-    if (!client) return;
+    if (!client) {
+      setIsCheckingAuth(false);
+      return;
+    }
     setIsProfileLoading(true);
     try {
       const { data, error } = await client
