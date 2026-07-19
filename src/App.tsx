@@ -9,8 +9,7 @@ import {
 } from './constants';
 import { 
   getSupabaseConfig, 
-  getSupabaseClient, 
-  saveSupabaseConfig
+  getSupabaseClient
 } from './supabaseClient';
 import type { SupabaseConfig } from './supabaseClient';
 
@@ -149,7 +148,6 @@ function App() {
   const [expandedQuestId, setExpandedQuestId] = useState<string | null>(null);
 
   // Modals state
-  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isQuestModalOpen, setIsQuestModalOpen] = useState<boolean>(false);
   const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
   const [showLevelUp, setShowLevelUp] = useState<boolean>(false);
@@ -166,9 +164,7 @@ function App() {
   const [qXp, setQXp] = useState<number>(50);
   const [qGold, setQGold] = useState<number>(30);
 
-  // Form states (Settings)
-  const [sUrl, setSUrl] = useState<string>('');
-  const [sKey, setSKey] = useState<string>('');
+
 
   // Notification state
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
@@ -250,8 +246,6 @@ function App() {
   useEffect(() => {
     const config = getSupabaseConfig();
     setDbConfig(config);
-    setSUrl(config.url);
-    setSKey(config.key);
 
     const savedPhase = localStorage.getItem('benkyou_current_phase');
     if (savedPhase) {
@@ -260,7 +254,7 @@ function App() {
 
     const client = getSupabaseClient();
     if (client) {
-      client.auth.getSession().then(({ data: { session } }) => {
+      client.auth.getSession().then(({ data: { session } }: any) => {
         setUser(session?.user ?? null);
         if (session?.user) {
           fetchProfile(session.user.id);
@@ -271,7 +265,7 @@ function App() {
         setIsCheckingAuth(false);
       });
 
-      const { data: { subscription } } = client.auth.onAuthStateChange((_event, session) => {
+      const { data: { subscription } } = client.auth.onAuthStateChange((_event: any, session: any) => {
         setUser(session?.user ?? null);
         if (session?.user) {
           fetchProfile(session.user.id);
@@ -355,6 +349,12 @@ function App() {
   };
 
   const fetchData = async () => {
+    if (!user) {
+      loadFromLocalStorage();
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     const client = getSupabaseClient();
 
@@ -712,28 +712,7 @@ function App() {
     setSyncing(false);
   };
 
-  // Settings Save Logic
-  const handleSaveSettings = (e: React.FormEvent) => {
-    e.preventDefault();
-    saveSupabaseConfig(sUrl, sKey);
-    const newConfig = getSupabaseConfig();
-    setDbConfig(newConfig);
-    setIsSettingsOpen(false);
-    showNotification('Konfigurasi Supabase berhasil diperbarui!', 'success');
-  };
 
-  const handleClearSettings = () => {
-    if (window.confirm('Hapus konfigurasi Supabase dan kembali ke Local Storage?')) {
-      saveSupabaseConfig('', '');
-      setSUrl('');
-      setSKey('');
-      const newConfig = getSupabaseConfig();
-      setDbConfig(newConfig);
-      setUser(null);
-      setIsSettingsOpen(false);
-      showNotification('Konfigurasi Supabase dihapus. Beralih ke Local Storage.', 'info');
-    }
-  };
 
   const resetQuestForm = () => {
     setQTitle('');
@@ -1724,78 +1703,7 @@ function App() {
         </div>
       )}
 
-      {/* MODAL: Cloud Sync Configuration */}
-      {isSettingsOpen && (
-        <div className="rpg-modal-backdrop" onClick={() => setIsSettingsOpen(false)}>
-          <div className="rpg-modal" onClick={e => e.stopPropagation()}>
-            <div className="rpg-modal-header">
-              <span className="rpg-modal-title">Pengaturan Supabase</span>
-              <button onClick={() => setIsSettingsOpen(false)} className="rpg-icon-btn">
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            </div>
-            <form onSubmit={handleSaveSettings}>
-              <div className="rpg-modal-body">
-                <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-variant)', lineHeight: 1.4 }}>
-                  Hubungkan ke proyek cloud Supabase Anda untuk menyimpan data quest dan penyelesaian secara permanen.
-                </p>
 
-                <div className="rpg-form-group">
-                  <label className="rpg-label">SUPABASE URL</label>
-                  <input 
-                    type="url" 
-                    className="rpg-input" 
-                    value={sUrl} 
-                    onChange={e => setSUrl(e.target.value)} 
-                    placeholder="https://xyz.supabase.co"
-                    required
-                  />
-                </div>
-
-                <div className="rpg-form-group">
-                  <label className="rpg-label">SUPABASE ANON KEY</label>
-                  <input 
-                    type="password" 
-                    className="rpg-input" 
-                    value={sKey} 
-                    onChange={e => setSKey(e.target.value)} 
-                    placeholder="eyJhbGciOi..."
-                    required
-                  />
-                </div>
-
-                <div style={{ backgroundColor: 'var(--surface-container-lowest)', padding: '0.75rem', border: '1px solid var(--outline-variant)' }}>
-                  <p style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--primary-fixed)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Skema Database</p>
-                  <p style={{ fontSize: '0.7rem', color: 'var(--on-surface-variant)', lineHeight: 1.3 }}>
-                    Pastikan tabel <code>profiles</code>, <code>quests</code> dan <code>quest_completions</code> sudah di-setup sesuai skema SQL terbaru.
-                  </p>
-                </div>
-              </div>
-              <div className="rpg-modal-footer" style={{ justifyContent: 'space-between' }}>
-                <div>
-                  {dbConfig.isConfigured && (
-                    <button 
-                      type="button" 
-                      className="pixel-btn pixel-btn-danger"
-                      onClick={handleClearSettings}
-                    >
-                      Putuskan Cloud
-                    </button>
-                  )}
-                </div>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button type="button" className="pixel-btn" onClick={() => setIsSettingsOpen(false)}>
-                    Batal
-                  </button>
-                  <button type="submit" className="pixel-btn pixel-btn-primary">
-                    Simpan
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </>
   );
 

@@ -18,23 +18,18 @@ export const getSupabaseConfig = (): SupabaseConfig => {
   return { url: '', key: '', isConfigured: false, source: 'none' };
 };
 
+let cachedClient: any = null;
+
 export const getSupabaseClient = () => {
+  if (cachedClient) return cachedClient;
+
   const { url, key } = getSupabaseConfig();
   if (!url || !key) return null;
   try {
-    return createClient(url, key);
+    cachedClient = createClient(url, key);
+    return cachedClient;
   } catch (error) {
     console.error('Failed to initialize Supabase client:', error);
     return null;
-  }
-};
-
-export const saveSupabaseConfig = (url: string, key: string) => {
-  if (!url || !key) {
-    localStorage.removeItem('benkyou_supabase_url');
-    localStorage.removeItem('benkyou_supabase_key');
-  } else {
-    localStorage.setItem('benkyou_supabase_url', url.trim());
-    localStorage.setItem('benkyou_supabase_key', key.trim());
   }
 };
