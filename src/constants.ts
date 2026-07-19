@@ -1,226 +1,226 @@
 import type { Quest, ShopItem, KanjiItem } from './types';
 
 export const DEFAULT_QUESTS: Quest[] = [
-  // Fase 1
+  // Fase 1: Kesehatan & Hidrasi
   {
     id: 'sys-f1-pagi',
-    title: 'Kanji & Radikal Baru serta Peninjauan Ulang',
-    duration: '30 Menit',
+    title: 'Hidrasi Pagi (Minum Air Putih)',
+    duration: '5 Menit',
     time_of_day: 'Pagi',
     phase: 'Fase 1',
-    tools: 'WaniKani (Target: Level 1-5)',
-    details: 'Mempelajari 5-10 kanji baru per hari menggunakan cerita asosiasi radikal.',
+    tools: 'Gelas / Botol Air',
+    details: 'Minum 500ml air putih hangat sesaat setelah bangun tidur untuk merehidrasi tubuh.',
     is_custom: false
   },
   {
     id: 'sys-f1-siang',
-    title: 'Pembiasaan Auditori Pasif Pasca-Kana',
-    duration: '30 Menit',
+    title: 'Peregangan & Jalan Kaki Ringan',
+    duration: '20 Menit',
     time_of_day: 'Siang',
     phase: 'Fase 1',
-    tools: 'YouTube (Japanese with Shun / Slow Japanese)',
-    details: 'Mendengarkan klip audio tanpa teks untuk melatih pengenalan batas kata fonetis.',
+    tools: 'Sepatu Nyaman',
+    details: 'Berjalan kaki di luar ruangan untuk melancarkan sirkulasi darah dan mendapat vitamin D.',
     is_custom: false
   },
   {
     id: 'sys-f1-malam',
-    title: 'Studi Tata Bahasa Terstruktur & Latihan Penulisan',
-    duration: '90 Menit',
+    title: 'Merapikan Kamar & Ruang Kerja',
+    duration: '15 Menit',
     time_of_day: 'Malam',
     phase: 'Fase 1',
-    tools: 'LingoDeer / Jepang.org (Dasar Bunpou)',
-    details: 'Mempelajari satu poin tata bahasa baru dan membuat 3 kalimat kustom.',
+    tools: 'Alat Kebersihan',
+    details: 'Merapikan meja kerja dan merapikan kamar untuk kualitas tidur terbaik.',
     is_custom: false
   },
 
-  // Fase 2
+  // Fase 2: Produktivitas & Belajar
   {
     id: 'sys-f2-pagi',
-    title: 'Ekspansi Kanji & Tinjauan Kosakata Harian',
-    duration: '45 Menit',
+    title: 'Perencanaan Target & Prioritas Hari Ini',
+    duration: '10 Menit',
     time_of_day: 'Pagi',
     phase: 'Fase 2',
-    tools: 'WaniKani (Target: Level 6-12)',
-    details: 'Melakukan review kartu lama sebelum mempelajari 8-12 kosakata baru.',
+    tools: 'Buku Catatan / To-Do App',
+    details: 'Menentukan 3 tugas terpenting (MIT) yang wajib diselesaikan hari ini.',
     is_custom: false
   },
   {
     id: 'sys-f2-siang',
-    title: 'Pengkondisian Pendengaran Aktif-Pasif',
-    duration: '45 Menit',
+    title: 'Deep Work Session (Fokus Penuh)',
+    duration: '60 Menit',
     time_of_day: 'Siang',
     phase: 'Fase 2',
-    tools: 'Podcast Nihongo con Teppei for Beginners',
-    details: 'Mendengarkan monolog pendek dan menangkap partikel penanda.',
+    tools: 'Timer Pomodoro / Laptop',
+    details: 'Bekerja atau belajar tanpa gangguan handphone/media sosial untuk produktivitas maksimal.',
     is_custom: false
   },
   {
     id: 'sys-f2-malam',
-    title: 'Asimilasi Tata Bahasa N4 & Analisis Kalimat',
-    duration: '90 Menit',
+    title: 'Membaca Buku Non-Fiksi',
+    duration: '30 Menit',
     time_of_day: 'Malam',
     phase: 'Fase 2',
-    tools: 'Bunpro N4 & YouTube (Genki ToKini Andy)',
-    details: 'Mempelajari 2 pola kalimat baru dan menjawab kuis interaktif.',
+    tools: 'Buku Fisik / E-Reader',
+    details: 'Membaca minimal 10 halaman buku pengembangan diri atau ilmu pengetahuan baru.',
     is_custom: false
   },
 
-  // Fase 3
+  // Fase 3: Olahraga & Kebugaran
   {
     id: 'sys-f3-pagi',
-    title: 'Konsolidasi Kanji Menengah Atas & Leksikal',
-    duration: '45 Menit',
+    title: 'Sesi Peregangan Tubuh (Stretching)',
+    duration: '10 Menit',
     time_of_day: 'Pagi',
     phase: 'Fase 3',
-    tools: 'WaniKani (Target: Level 13-22)',
-    details: 'Menjaga kestabilan streak dan memprioritaskan bacaan kanji majemuk (onyomi).',
+    tools: 'Matras Yoga',
+    details: 'Melakukan peregangan tubuh secara dinamis untuk memperlancar sirkulasi darah pagi hari.',
     is_custom: false
   },
   {
     id: 'sys-f3-siang',
-    title: 'Sinkronisasi Pendengaran Tingkat Menengah',
+    title: 'Olahraga Intensitas Sedang',
     duration: '45 Menit',
     time_of_day: 'Siang',
     phase: 'Fase 3',
-    tools: 'Podcast Bite Sized Japanese / Sayuri Saying',
-    details: 'Mendengarkan monolog natural dengan transkrip untuk konfirmasi kata.',
+    tools: 'Sepatu Olahraga / Dumbbell',
+    details: 'Melakukan latihan kekuatan (push-up, squat) atau kardio untuk membakar kalori.',
     is_custom: false
   },
   {
     id: 'sys-f3-malam',
-    title: 'Imersi Aktif & Analisis Teks Naratif',
-    duration: '120 Menit',
+    title: 'Mandi Air Hangat & Relaksasi Otot',
+    duration: '20 Menit',
     time_of_day: 'Malam',
     phase: 'Fase 3',
-    tools: 'Netflix/YouTube + Migaku / Satori Reader',
-    details: 'Menonton 1 episode dengan teks Jepang & membedah 2 cerita pendek.',
+    tools: 'Shower / Sabun Aroma Terapi',
+    details: 'Mandi air hangat untuk merelaksasikan otot-otot yang tegang setelah seharian beraktivitas.',
     is_custom: false
   },
 
-  // Fase 4
+  // Fase 4: Refleksi & Mental Health
   {
     id: 'sys-f4-pagi',
-    title: 'Penguasaan Kanji & Kosakata Kompleks N2',
-    duration: '60 Menit',
+    title: 'Meditasi / Latihan Pernapasan',
+    duration: '10 Menit',
     time_of_day: 'Pagi',
     phase: 'Fase 4',
-    tools: 'Anki (Dek Core 6k) & WaniKani (Level 23-35)',
-    details: 'Pembelajaran cepat kosakata abstrak dan fokus pada perbedaan kata sinonim.',
+    tools: 'Tempat Tenang / Timer',
+    details: 'Melakukan pernapasan dalam (box breathing) untuk memenangkan pikiran sebelum mulai bekerja.',
     is_custom: false
   },
   {
     id: 'sys-f4-siang',
-    title: 'Imersi Auditoris Tingkat Tinggi',
+    title: 'Digital Detox Saat Istirahat',
     duration: '60 Menit',
     time_of_day: 'Siang',
     phase: 'Fase 4',
-    tools: 'Podcast YUYU Nihongo / 4989 American Life',
-    details: 'Mendengarkan diskusi topik kompleks dengan kecepatan asli tanpa visual.',
+    tools: 'Mode Jangan Ganggu (DND)',
+    details: 'Mematikan semua notifikasi HP saat jam istirahat siang untuk mengurangi kecemasan digital.',
     is_custom: false
   },
   {
     id: 'sys-f4-malam',
-    title: 'Studi Dokkai (Membaca) Berita & Tata Bahasa',
-    duration: '120 Menit',
+    title: 'Jurnal Syukur & Evaluasi Harian',
+    duration: '15 Menit',
     time_of_day: 'Malam',
     phase: 'Fase 4',
-    tools: 'Todaii Easy Japanese / Bunpro N2',
-    details: 'Membaca 3 artikel berita dengan teknik pemindaian struktural (skimming).',
+    tools: 'Jurnal / Pulpen',
+    details: 'Menuliskan 3 hal baik yang terjadi hari ini dan mengevaluasi pencapaian harian.',
     is_custom: false
   },
 
-  // Fase 5
+  // Fase 5: Hobi & Kreativitas
   {
     id: 'sys-f5-pagi',
-    title: 'Pemantapan Kosakata & Kanji Lemah',
-    duration: '60 Menit',
+    title: 'Latihan Keterampilan Baru',
+    duration: '30 Menit',
     time_of_day: 'Pagi',
     phase: 'Fase 5',
-    tools: 'Dek Anki Pribadi (Kesalahan Simulasi)',
-    details: 'Meninjau khusus pada kata-kata yang sering salah dijawab saat simulasi.',
+    tools: 'Kursus Online / Sandbox Coding',
+    details: 'Belajar skill baru secara konsisten seperti pemrograman, bahasa baru, atau seni.',
     is_custom: false
   },
   {
     id: 'sys-f5-siang',
-    title: 'Pemantapan Pendengaran Format Ujian',
-    duration: '60 Menit',
+    title: 'Mendengarkan Podcast Edukatif',
+    duration: '30 Menit',
     time_of_day: 'Siang',
     phase: 'Fase 5',
-    tools: 'Aplikasi Star JLPT / YouTube Choukai Practice',
-    details: 'Melatih taktik mencatat informasi kunci (note-taking) secara instan.',
+    tools: 'Spotify / YouTube',
+    details: 'Mendengarkan bahasan menarik seputar finansial, sains, atau sejarah saat istirahat siang.',
     is_custom: false
   },
   {
     id: 'sys-f5-malam',
-    title: 'Pengerjaan Paket Soal Ujian Riil',
-    duration: '120 Menit',
+    title: 'Eksperimen Projek Sampingan Kreatif',
+    duration: '60 Menit',
     time_of_day: 'Malam',
     phase: 'Fase 5',
-    tools: 'Migii JLPT / Nihon GO! Practice Test',
-    details: 'Menyelesaikan satu bundel soal tes riil dalam batas waktu ketat.',
+    tools: 'VS Code / Desain Tool / Canvas',
+    details: 'Meluangkan waktu untuk mengerjakan projek sampingan (side project) kreatif pribadi.',
     is_custom: false
   },
 
   // Alternatif
   {
-    id: 'sys-alt-kanji',
-    title: 'Kanji',
-    duration: '15 Menit',
-    time_of_day: 'Bebas',
-    phase: 'Alternatif',
-    tools: 'WaniKani',
-    details: 'Mempelajari dan melatih Kanji harian.',
-    is_custom: false
-  },
-  {
-    id: 'sys-alt-kosakata',
-    title: 'Kosakata',
-    duration: '20 Menit',
-    time_of_day: 'Bebas',
-    phase: 'Alternatif',
-    tools: 'Anki / MochiVocab',
-    details: 'Melatih ingatan kosakata baru dan mengulang kosakata lama.',
-    is_custom: false
-  },
-  {
-    id: 'sys-alt-tatabahasa',
-    title: 'Tata Bahasa',
-    duration: '20 Menit',
-    time_of_day: 'Bebas',
-    phase: 'Alternatif',
-    tools: 'Bunpro / Tae Kim',
-    details: 'Mempelajari tata bahasa baru dan meninjau pemahaman kalimat.',
-    is_custom: false
-  },
-  {
-    id: 'sys-alt-dengar',
-    title: 'Mendengarkan / Shadowing',
-    duration: '15 Menit',
-    time_of_day: 'Bebas',
-    phase: 'Alternatif',
-    tools: 'Podcast',
-    details: 'Mendengarkan podcast bahasa Jepang aktif sambil menirukan pengucapan (shadowing).',
-    is_custom: false
-  },
-  {
-    id: 'sys-alt-tulis',
-    title: 'Latihan Menulis atau Mengetik',
+    id: 'sys-alt-air',
+    title: 'Minum Air 2 Liter Harian',
     duration: '5 Menit',
     time_of_day: 'Bebas',
     phase: 'Alternatif',
-    tools: 'Buku Catatan / Keyboard Jepang',
-    details: 'Menulis jurnal singkat atau melatih kecepatan mengetik hiragana/katakana/kanji.',
+    tools: 'Tumblr Air 2L',
+    details: 'Memastikan konsumsi air minum harian tercapai minimal 2 liter.',
+    is_custom: false
+  },
+  {
+    id: 'sys-alt-bed',
+    title: 'Merapikan Tempat Tidur',
+    duration: '5 Menit',
+    time_of_day: 'Bebas',
+    phase: 'Alternatif',
+    tools: 'Tangan Sendiri',
+    details: 'Merapikan sprei, bantal, dan selimut segera setelah bangun tidur pagi.',
+    is_custom: false
+  },
+  {
+    id: 'sys-alt-read',
+    title: 'Membaca Artikel Menarik',
+    duration: '15 Menit',
+    time_of_day: 'Bebas',
+    phase: 'Alternatif',
+    tools: 'Browser / Medium',
+    details: 'Membaca satu artikel edukatif atau berita teknologi terbaru.',
+    is_custom: false
+  },
+  {
+    id: 'sys-alt-walk',
+    title: 'Jalan Santai Sore Hari',
+    duration: '15 Menit',
+    time_of_day: 'Bebas',
+    phase: 'Alternatif',
+    tools: 'Taman / Kompleks Rumah',
+    details: 'Berjalan santai 1000 langkah di sore hari untuk melepas penat.',
+    is_custom: false
+  },
+  {
+    id: 'sys-alt-sleep',
+    title: 'Mempersiapkan Tidur Berkualitas',
+    duration: '10 Menit',
+    time_of_day: 'Bebas',
+    phase: 'Alternatif',
+    tools: 'Kamar Tidur Nyaman',
+    details: 'Mematikan layar gawai 30 menit sebelum tidur dan meredupkan lampu.',
     is_custom: false
   }
 ];
 
 export const PHASE_LABELS = {
-  'Fase 1': 'Fase 1 (Bulan 1 - 2): Peletakan Fondasi N5',
-  'Fase 2': 'Fase 2 (Bulan 3 - 5): Akselerasi N4',
-  'Fase 3': 'Fase 3 (Bulan 6 - 8): Transisi Menengah N3',
-  'Fase 4': 'Fase 4 (Bulan 9 - 10): Penetrasi N2',
-  'Fase 5': 'Fase 5 (Bulan 11 - 12): Simulasi & Otomatisasi',
-  'Alternatif': 'Alternatif: Rutinitas Harian Ringkas (75 Menit)'
+  'Fase 1': 'Fase 1: Kesehatan & Hidrasi',
+  'Fase 2': 'Fase 2: Produktivitas & Belajar',
+  'Fase 3': 'Fase 3: Olahraga & Kebugaran',
+  'Fase 4': 'Fase 4: Refleksi & Mental Health',
+  'Fase 5': 'Fase 5: Hobi & Kreativitas',
+  'Alternatif': 'Alternatif: Rutinitas Harian Ringkas'
 };
 
 // RPG static assets and configurations
@@ -232,21 +232,20 @@ export const SHOP_ITEMS: ShopItem[] = [
   { id: 'hp_potion', name: 'Ramuan HP', price: 40, desc: 'Memulihkan 30 Health Points.', icon: 'local_hospital', type: 'hp', amount: 30 },
   { id: 'mp_potion', name: 'Ramuan Mana', price: 40, desc: 'Memulihkan 30 Mana Points.', icon: 'bolt', type: 'mp', amount: 30 },
   { id: 'xp_elixir', name: 'Elixir XP', price: 120, desc: 'Mendapatkan +200 XP secara instan.', icon: 'star', type: 'xp', amount: 200 },
-  { id: 'kanji_scroll', name: 'Mantra Kanji', price: 180, desc: 'Membuka 1 Kanji N3/N2 acak di Tas.', icon: 'menu_book', type: 'kanji', amount: 1 }
+  { id: 'kanji_scroll', name: 'Rune Sihir Kuno', price: 180, desc: 'Membuka 1 Rune Sihir Kuno acak di Tas.', icon: 'menu_book', type: 'kanji', amount: 1 }
 ];
 
 export const KANJI_POOL: KanjiItem[] = [
-  { char: '語', onyomi: 'GO', kunyomi: 'kata(ru)', meaning: 'Bahasa / Berkata' },
-  { char: '強', onyomi: 'KYOU, GOU', kunyomi: 'tsuyo(i)', meaning: 'Kuat / Memaksa' },
-  { char: '勉', onyomi: 'BEN', kunyomi: 'tsuto(meru)', meaning: 'Berusaha / Rajin' },
-  { char: '記', onyomi: 'KI', kunyomi: 'shiru(su)', meaning: 'Mencatat / Rekam' },
-  { char: '法', onyomi: 'HOU, HATSU', kunyomi: 'nori', meaning: 'Aturan / Hukum / Metode' },
-  { char: '読', onyomi: 'DOKU', kunyomi: 'yo(mu)', meaning: 'Membaca' },
-  { char: '聞', onyomi: 'BUN, MON', kunyomi: 'ki(ku)', meaning: 'Mendengar / Bertanya' },
-  { char: '書', onyomi: 'SHO', kunyomi: 'ka(ku)', meaning: 'Menulis / Buku' },
-  { char: '練', onyomi: 'REN', kunyomi: 'ne(ru)', meaning: 'Latihan / Melatih' },
-  { char: '習', onyomi: 'SHUU', kunyomi: 'nara(u)', meaning: 'Belajar / Kebiasaan' },
-  { char: '漢', onyomi: 'KAN', kunyomi: 'otoko', meaning: 'Cina / Karakter Kanji' },
-  { char: '字', onyomi: 'JI', kunyomi: 'aza', meaning: 'Karakter / Huruf' }
+  { char: '力', onyomi: 'RYOKU, RIKI', kunyomi: 'chikara', meaning: 'Kekuatan / Power' },
+  { char: '水', onyomi: 'SUI', kunyomi: 'mizu', meaning: 'Air / Water' },
+  { char: '火', onyomi: 'KA', kunyomi: 'hi', meaning: 'Api / Fire' },
+  { char: '風', onyomi: 'FUU', kunyomi: 'kaze', meaning: 'Angin / Wind' },
+  { char: '土', onyomi: 'TO, DO', kunyomi: 'tsuchi', meaning: 'Tanah / Earth' },
+  { char: '雷', onyomi: 'RAI', kunyomi: 'kaminari', meaning: 'Petir / Thunder' },
+  { char: '光', onyomi: 'KOU', kunyomi: 'hika(ru)', meaning: 'Cahaya / Light' },
+  { char: '闇', onyomi: 'AN', kunyomi: 'yami', meaning: 'Kegelapan / Darkness' },
+  { char: '心', onyomi: 'SHIN', kunyomi: 'kokoro', meaning: 'Pikiran / Heart' },
+  { char: '生', onyomi: 'SEI, SHOU', kunyomi: 'i(kiru)', meaning: 'Kehidupan / Life' },
+  { char: '死', onyomi: 'SHI', kunyomi: 'shi(nu)', meaning: 'Kematian / Death' },
+  { char: '空', onyomi: 'KUU', kunyomi: 'sora', meaning: 'Langit / Void / Space' }
 ];
-

@@ -234,7 +234,7 @@ function App() {
             showNotification(`GAME OVER! Kamu absen selama ${diffDays} hari. Level turun, Gold berkurang 50%.`, 'error');
             return 100;
           } else {
-            showNotification(`Oh tidak! Kamu melewatkan ${diffDays} hari belajar. Terkena -${totalDamage} HP damage dari monster malas!`, 'error');
+            showNotification(`Oh tidak! Kamu melewatkan ${diffDays} hari kebiasaan. Terkena -${totalDamage} HP damage dari monster malas!`, 'error');
             return nextHp;
           }
         });
@@ -840,7 +840,7 @@ function App() {
   // Sensei Kenji dynamic dialogue messages
   const getSenseiDialogue = () => {
     if (hp < 30) return 'Darahmu menipis! Kunjungi Toko untuk membeli Ramuan HP sebelum kena Game Over!';
-    if (mp < 20) return 'Energi belajarmu habis (MP rendah). Belilah Ramuan Mana di Toko untuk memulihkannya!';
+    if (mp < 20) return 'Energi aktivitasmu habis (MP rendah). Belilah Ramuan Mana di Toko untuk memulihkannya!';
     
     const today = getTodayDateString();
     const todayQuests = quests.filter(q => q.phase === currentPhase);
@@ -850,7 +850,7 @@ function App() {
       return 'Luar biasa, Adventurer! Semua quest harian Fase ini sudah selesai. Kamu siap menempuh tantangan baru besok!';
     }
     
-    return 'Selamat belajar, Adventurer! Selesaikan quest harianmu agar mendapatkan XP dan Gold melimpah.';
+    return 'Semangat menyelesaikan kebiasaan baikmu hari ini, Adventurer! Selesaikan quest harianmu agar mendapatkan XP dan Gold melimpah.';
   };
 
   const activePhaseQuests = quests.filter(q => q.phase === currentPhase);
@@ -979,7 +979,7 @@ function App() {
             marginBottom: '0.75rem',
             fontFamily: 'Cinzel, Georgia, serif'
           }}>
-            ISEKAI NIHONGO
+            HABITS ADVENTURE
           </h1>
           
           <p style={{ 
@@ -988,7 +988,7 @@ function App() {
             marginBottom: '2.5rem',
             lineHeight: '1.6'
           }}>
-            Mulailah petualangan RPG belajar Bahasa Jepang harian Anda. Silakan masuk menggunakan Google OAuth untuk mensinkronisasikan dan mengamankan progres petualangan Anda.
+            Ubah kebiasaan harian Anda menjadi petualangan RPG yang seru. Silakan masuk menggunakan Google OAuth untuk mensinkronisasikan dan mengamankan progres petualangan Anda.
           </p>
 
           <button 
@@ -1046,7 +1046,7 @@ function App() {
       <header className="game-header">
         <div className="game-title">
           <span className="material-symbols-outlined spin text-primary-fixed" style={{ fontSize: '2rem' }}>swords</span>
-          ISEKAI NIHONGO
+          HABITS ADVENTURE
         </div>
         <div className="flex items-center gap-3">
           {user ? (
@@ -1525,7 +1525,7 @@ function App() {
               Selamat! Kamu meningkat ke Level {level}!
             </p>
             <p style={{ fontSize: '0.85rem', color: 'var(--on-surface-variant)', marginBottom: '2rem' }}>
-              HP & MP pulih sepenuhnya. Terus pertahaman ritme belajar harianmu!
+              HP & MP pulih sepenuhnya. Terus pertahankan ritme kebiasaan harianmu!
             </p>
             <button 
               className="pixel-btn pixel-btn-primary"
@@ -1596,7 +1596,7 @@ function App() {
                     className="rpg-input" 
                     value={qTitle} 
                     onChange={e => setQTitle(e.target.value)} 
-                    placeholder="Contoh: Belajar Tata Bahasa N3"
+                    placeholder="Contoh: Minum Air Putih 2 Liter"
                     required 
                   />
                 </div>
@@ -1614,7 +1614,7 @@ function App() {
                     />
                   </div>
                   <div className="rpg-form-group">
-                    <label className="rpg-label">Fase Belajar</label>
+                    <label className="rpg-label">Kategori / Fase</label>
                     <select 
                       className="rpg-select" 
                       value={qPhase} 
@@ -1696,7 +1696,7 @@ function App() {
                     className="rpg-input" 
                     value={qTools} 
                     onChange={e => setQTools(e.target.value)} 
-                    placeholder="Contoh: Anki, YouTube, Jisho"
+                    placeholder="Contoh: Matras Yoga, Jurnal, Botol 2L"
                   />
                 </div>
 
@@ -1707,7 +1707,7 @@ function App() {
                     value={qDetails} 
                     onChange={e => setQDetails(e.target.value)} 
                     rows={3}
-                    placeholder="Masukkan rincian quest, bahan bacaan, atau panduan materi belajar..."
+                    placeholder="Masukkan rincian quest, instruksi kebiasaan, atau catatan target..."
                   />
                 </div>
               </div>
